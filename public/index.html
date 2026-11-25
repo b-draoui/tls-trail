@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TLS Trail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+<header class="band"><div class="wrap">
+<span class="tab">Cybersecurity lab</span>
+<h1>One message, from your browser to AES and back</h1>
+<p class="lead">A page to revisit the monsite.local lab with Nginx only: follow a real request step by step, see how Nginx spreads the load, then test yourself.</p>
+<nav class="nav"><a href="#simulator">Request simulator</a><a href="#load-balancing">Load balancing demo</a><a href="#quiz">Quiz</a></nav>
+</div></header>
+
+<section class="band sec" id="simulator"><div class="wrap">
+<h2>Request simulator</h2>
+<p class="intro">Type a message, pick an action, then walk through the steps. Each click sends a real request to your server: the headers, backend port and AES result shown here are what the backend actually received and computed.</p>
+<p class="who" id="ctx">Connecting…</p>
+<div class="map" aria-label="Request path">
+<div class="node" id="n-client"><b>Browser</b><small>client</small></div>
+<div class="link tls" id="l-1"><div class="wire"></div><span>Encrypted HTTPS</span></div>
+<div class="node" id="n-nginx"><b>Nginx :443</b><small>terminates TLS</small></div>
+<div class="link clr" id="l-2"><div class="wire"></div><span>Plain HTTP</span></div>
+<div class="backs"><div class="node" id="n-b1"><b>Backend :3000</b><small>Express + AES</small></div><div class="node" id="n-b2"><b>Backend :3001</b><small>Express + AES</small></div></div>
+</div>
+<form class="form" id="simForm">
+<label class="f">Message<input id="msg" value="Hello" autocomplete="off"></label>
+<label class="f">Action<select id="mode"><option value="encrypt">/encrypt</option><option value="decrypt">/decrypt</option></select></label>
+<button class="btn" type="submit">Send</button>
+</form>
+<div class="stepper">
+<div><div class="dots" id="dots"></div><div class="st" id="stText"><div class="empty">Click “Send” to fire a request.</div></div>
+<div class="navbtns"><button class="btn ghost" id="prev" type="button" disabled>Previous</button><button class="btn" id="next" type="button" disabled>Next step</button></div></div>
+<div class="wire-box"><h4 id="pkTitle">What travels at this step</h4><pre class="pk" id="pk">—</pre></div>
+</div>
+</div></section>
+
+<section class="band sec" id="load-balancing"><div class="wrap">
+<h2>Load balancing demo</h2>
+<p class="intro">These buttons send real requests to <code>/lab/api/whoami</code> through Nginx. Each answer says which backend handled it. You change the settings in your Nginx config and your terminals, then come back here to see the effect.</p>
+<div class="lb">
+<div>
+<div class="row"><button class="btn" id="send1" type="button">Send 1 request</button><button class="btn ghost" id="send10" type="button">10 in a row</button><button class="btn ghost" id="sendp" type="button">10 in parallel</button><button class="btn ghost" id="reset" type="button">Reset</button></div>
+<div class="opts">
+<p class="foot" style="margin:0">Experiments to try:</p>
+<p class="foot" style="margin:0">1. Without <code>zone</code> in the upstream, send 10 in parallel: is the alternation strict?</p>
+<p class="foot" style="margin:0">2. Add <code>zone backend_servers 64k;</code> to the upstream, run <code>sudo systemctl reload nginx</code>, try again.</p>
+<p class="foot" style="margin:0">3. Stop the :3001 backend (Ctrl+C in its terminal) and send more requests.</p>
+</div>
+</div>
+<div>
+<div class="bar"><div class="lab"><span>Backend :3000</span><span id="c1">0</span></div><div class="track"><div class="fill" id="f1" style="width:0%"></div></div></div>
+<div class="bar b2"><div class="lab"><span>Backend :3001</span><span id="c2">0</span></div><div class="track"><div class="fill" id="f2" style="width:0%"></div></div></div>
+<div class="log" id="log" aria-live="polite"></div>
+<p class="verdict" id="verdict"></p>
+</div>
+</div>
+</div></section>
+
+<section class="band sec" id="quiz"><div class="wrap">
+<h2>Quiz</h2>
+<p class="intro">Nine questions on what the lab does. One click per question; the explanation shows right after.</p>
+<div class="row" style="align-items:center;gap:18px"><span class="score" id="score">0 / 9</span><button class="btn ghost" id="qreset" type="button">Start over</button></div>
+<div class="qs" id="qs"></div>
+</div></section>
+
+<script src="app.js"></script>
+
+</body>
+</html>
